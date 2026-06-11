@@ -18,20 +18,25 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
 
       - run: npm ci
 
-      - run: npm run build
+      - run: npm run build:pages
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Verify build output
+        run: |
+          test -f docs/index.html
+          ! grep -q 'src/main.tsx' docs/index.html
+
+      - uses: actions/upload-pages-artifact@v5
         with:
-          path: dist
+          path: docs
 
   deploy:
     needs: build
@@ -41,4 +46,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
